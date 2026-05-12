@@ -21,9 +21,9 @@ const swaggerOptions = {
             version: '1.0.0',
             description: 'API Documentation',
         },
-        servers: [
-            { url: 'http://localhost:3000/api/v1' }
-        ],
+       servers: [
+    { url: 'https://gradutionapi-production.up.railway.app/api/v1' }
+],
     },
     apis: ['./routes/*.js'],
 };
