@@ -93,6 +93,7 @@ router.post('/AddItems', async (req, res) => {
 
     cart = await cart.save();
     if (!cart) return res.status(400).send('Cart cannot be updated');
+    cart = await cart.populate('cartItems.product'); // ✅ populate
     res.send(cart);
 });
 
@@ -137,6 +138,7 @@ router.delete('/items/:productId', async (req, res) => {
     );
 
     cart = await cart.save();
+    cart = await cart.populate('cartItems.product'); // ✅ populate
     res.send(cart);
 });
 
@@ -187,6 +189,7 @@ router.put('/items/:productId', async (req, res) => {
     );
 
     cart = await cart.save();
+    cart = await cart.populate('cartItems.product'); // ✅ populate
     res.send(cart);
 });
 
