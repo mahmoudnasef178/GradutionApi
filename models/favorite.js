@@ -6,7 +6,7 @@ const favoriteSchema = new mongoose.Schema({
     required: true,
   },
   favoriteItems: [{
-    type: mongoose.Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,  // ✅ ده صح لأن productId هو MongoDB ObjectId
     ref: 'Product'
   }]
 });
