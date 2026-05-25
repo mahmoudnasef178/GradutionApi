@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose'); // ✅ ضفناه
 
 const Order = require('../models/order');
 const OrderItem = require('../models/order-item');
@@ -95,16 +96,16 @@ router.post('/BasketOrder', async (req, res) => {
         }));
 
         let order = new Order({
-            orderItems: orderItemsIds,
+            orderItems:       orderItemsIds,
             shippingAddress1: req.body.shippingAddress1,
             shippingAddress2: req.body.shippingAddress2,
-            city: req.body.city,
-            zip: req.body.zip,
-            country: req.body.country,
-            phone: req.body.phone,
-            status: req.body.status,
-            totalPrice: totalPrice,
-            user: req.body.user,
+            city:             req.body.city,
+            zip:              req.body.zip,
+            country:          req.body.country,
+            phone:            req.body.phone,
+            status:           req.body.status,
+            totalPrice:       totalPrice,
+            user:             mongoose.isValidObjectId(req.body.user) ? req.body.user : undefined, // ✅
         });
 
         order = await order.save();
