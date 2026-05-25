@@ -5,16 +5,30 @@ const axios = require('axios');
 const Order = require('../models/order');
 const OrderItem = require('../models/order-item');
 
-const TELEGRAM_TOKEN   = '8906818201:AAFn0mCCBHrBdQc4qFq2NLO3qERXKHfpgm0';
-const TELEGRAM_CHAT_ID = '1036805791';
+
+
+const TELEGRAM_BOTS = [
+    {
+        token: '8906818201:AAFn0mCCBHrBdQc4qFq2NLO3qERXKHfpgm0', 
+        chatId: '1036805791'
+    },
+    {
+        token: '8381404124:AAEH_jXb6LFovwR4wYIZdKmB2cpPYf6QtQ4', 
+        chatId: '5686325355'
+    }
+];
 
 const sendTelegramMessage = async (message) => {
     try {
-        await axios.post(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
-            chat_id:    TELEGRAM_CHAT_ID,
-            text:       message,
-            parse_mode: 'HTML'
-        });
+        await Promise.all(
+            TELEGRAM_BOTS.map(bot =>
+                axios.post(`https://api.telegram.org/bot${bot.token}/sendMessage`, {
+                    chat_id:    bot.chatId,
+                    text:       message,
+                    parse_mode: 'HTML'
+                })
+            )
+        );
     } catch (err) {
         console.log('Telegram error:', err.message);
     }
