@@ -9,7 +9,7 @@ const OrderItem = require('../models/order-item');
 
 const TELEGRAM_BOTS = [
     {
-        token: '8906818201:AAFn0mCCBHrBdQc4qFq2NLO3qERXKHfpgm0', 
+        token: '8906818201:AAHipfIZHt1hnlfLAeTzhTBj56eP4Uirc8w', 
         chatId: '1036805791'
     },
     {
