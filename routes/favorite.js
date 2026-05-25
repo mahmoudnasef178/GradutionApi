@@ -1,9 +1,9 @@
 const { Favorite } = require('../models/favorite');
-const { Product } = require('../models/product'); // ✅ أضف ده
+const { Product } = require('../models/product'); 
 const express = require('express');
 const router = express.Router();
 
-// ✅ POST - مش بيتحقق من وجود الـ product خالص
+
 router.post('/AddItems', async (req, res) => {
     try {
         const { user, productId } = req.body;
@@ -12,7 +12,6 @@ router.post('/AddItems', async (req, res) => {
             return res.status(400).send('user and productId are required');
         }
 
-        // ✅ تحقق إن الـ productId صالح ObjectId
         if (!mongoose.Types.ObjectId.isValid(productId)) {
             return res.status(400).json({ message: 'Invalid product ID' });
         }
@@ -38,14 +37,14 @@ router.post('/AddItems', async (req, res) => {
     }
 });
 
-// ✅ GET - بيرجع items مع بيانات الـ product كاملة
+
 router.get('/:userId', async (req, res) => {
     try {
         const favoriteList = await Favorite.findOne({ 
             user: req.params.userId 
         }).populate('favoriteItems');
         
-        // ✅ لو مفيش favorites، رجّع object فاضي مش error
+        
         if (!favoriteList) {
             return res.status(200).json({ 
                 user: req.params.userId, 
@@ -53,7 +52,7 @@ router.get('/:userId', async (req, res) => {
             });
         }
 
-        // ✅ format الـ response عشان يتطابق مع الـ Flutter model
+
         const formattedItems = favoriteList.favoriteItems.map(product => ({
             id: product._id,
             productName: product.name,
@@ -71,7 +70,6 @@ router.get('/:userId', async (req, res) => {
     }
 });
 
-// ✅ DELETE
 router.delete('/items/:productId', async (req, res) => {
     try {
         const { userId } = req.body;
