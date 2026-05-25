@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const axios = require('axios');
+
 
 const Order = require('../models/order');
 const OrderItem = require('../models/order-item');
@@ -22,10 +22,14 @@ const sendTelegramMessage = async (message) => {
     try {
         await Promise.all(
             TELEGRAM_BOTS.map(bot =>
-                axios.post(`https://api.telegram.org/bot${bot.token}/sendMessage`, {
-                    chat_id:    bot.chatId,
-                    text:       message,
-                    parse_mode: 'HTML'
+                fetch(`https://api.telegram.org/bot${bot.token}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id:    bot.chatId,
+                        text:       message,
+                        parse_mode: 'HTML'
+                    })
                 })
             )
         );
