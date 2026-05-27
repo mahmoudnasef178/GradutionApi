@@ -2,62 +2,7 @@ const { Cart } = require('../models/cart');
 const express = require('express');
 const router = express.Router();
 
-/**
- * @swagger
- * tags:
- *   name: Cart
- *   description: Cart management
- */
-
-/**
- * @swagger
- * /cart/{userId}:
- *   get:
- *     summary: Get cart for a user
- *     tags: [Cart]
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: User cart data
- */
-router.get('/:userId', async (req, res) => {
-    const cart = await Cart.findOne({ user: req.params.userId })
-        .populate('cartItems.product');
-    if (!cart) return res.status(200).json({ user: req.params.userId, cartItems: [], totalPrice: 0 });
-    res.send(cart);
-});
-
-/**
- * @swagger
- * /cart/AddItems:
- *   post:
- *     summary: Add item to cart
- *     tags: [Cart]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [user, productId, price]
- *             properties:
- *               user:
- *                 type: string
- *               productId:
- *                 type: string
- *               price:
- *                 type: number
- *     responses:
- *       200:
- *         description: Item added to cart
- *       400:
- *         description: Cart cannot be updated
- */
+// ✅ الـ specific routes الأول
 router.post('/AddItems', async (req, res) => {
     let cart = await Cart.findOne({ user: req.body.user });
 
@@ -93,38 +38,10 @@ router.post('/AddItems', async (req, res) => {
 
     cart = await cart.save();
     if (!cart) return res.status(400).send('Cart cannot be updated');
-    cart = await cart.populate('cartItems.product'); // ✅ populate
+    cart = await cart.populate('cartItems.product');
     res.send(cart);
 });
 
-/**
- * @swagger
- * /cart/items/{productId}:
- *   delete:
- *     summary: Remove item from cart
- *     tags: [Cart]
- *     parameters:
- *       - in: path
- *         name: productId
- *         required: true
- *         schema:
- *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [userId]
- *             properties:
- *               userId:
- *                 type: string
- *     responses:
- *       200:
- *         description: Item removed from cart
- *       400:
- *         description: Cart not found
- */
 router.delete('/items/:productId', async (req, res) => {
     let cart = await Cart.findOne({ user: req.body.userId });
     if (!cart) return res.status(400).send('Cart not found');
@@ -138,40 +55,10 @@ router.delete('/items/:productId', async (req, res) => {
     );
 
     cart = await cart.save();
-    cart = await cart.populate('cartItems.product'); // ✅ populate
+    cart = await cart.populate('cartItems.product');
     res.send(cart);
 });
 
-/**
- * @swagger
- * /cart/items/{productId}:
- *   put:
- *     summary: Update item quantity in cart
- *     tags: [Cart]
- *     parameters:
- *       - in: path
- *         name: productId
- *         required: true
- *         schema:
- *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [userId, quantity]
- *             properties:
- *               userId:
- *                 type: string
- *               quantity:
- *                 type: number
- *     responses:
- *       200:
- *         description: Quantity updated
- *       400:
- *         description: Cart not found
- */
 router.put('/items/:productId', async (req, res) => {
     let cart = await Cart.findOne({ user: req.body.userId });
     if (!cart) return res.status(400).send('Cart not found');
@@ -189,28 +76,18 @@ router.put('/items/:productId', async (req, res) => {
     );
 
     cart = await cart.save();
-    cart = await cart.populate('cartItems.product'); // ✅ populate
+    cart = await cart.populate('cartItems.product');
     res.send(cart);
 });
 
-/**
- * @swagger
- * /cart/{userId}:
- *   delete:
- *     summary: Clear entire cart for a user
- *     tags: [Cart]
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Cart cleared
- *       400:
- *         description: Cart not found
- */
+// ✅ الـ /:userId الأخير دايماً
+router.get('/:userId', async (req, res) => {
+    const cart = await Cart.findOne({ user: req.params.userId })
+        .populate('cartItems.product');
+    if (!cart) return res.status(200).json({ user: req.params.userId, cartItems: [], totalPrice: 0 });
+    res.send(cart);
+});
+
 router.delete('/:userId', async (req, res) => {
     const cart = await Cart.findOneAndDelete({ user: req.params.userId });
     if (!cart) return res.status(400).send('Cart not found');

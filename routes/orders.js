@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose'); // ✅ ضفناه
+const mongoose = require('mongoose'); 
 
 const Order = require('../models/order');
 const OrderItem = require('../models/order-item');
@@ -30,7 +30,6 @@ const sendTelegramMessage = async (message) => {
     }
 };
 
-// ✅ الـ specific routes الأول دايماً
 router.get('/get/count', async (req, res) => {
     const orderCount = await Order.countDocuments();
     if (!orderCount) return res.status(500).json({ success: false });
