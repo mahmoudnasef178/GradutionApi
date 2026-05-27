@@ -7,7 +7,7 @@ const OrderItem = require('../models/order-item');
 
 const TELEGRAM_BOTS = [
     { token: '8906818201:AAHipfIZHt1hnlfLAeTzhTBj56eP4Uirc8w', chatId: '1036805791' },
-    { token: '8381404124:AAEH_jXb6LFovwR4wYIZdKmB2cpPYf6QtQ4', chatId: '5686325355' }
+    { token: '8381404124:AAHT76xN33xPZPWBaleYOn0ZrzsWK5zftaA', chatId: '5686325355' }
 ];
 
 const sendTelegramMessage = async (message) => {
