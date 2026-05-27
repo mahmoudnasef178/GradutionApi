@@ -12,7 +12,7 @@ const TELEGRAM_BOTS = [
 
 const sendTelegramMessage = async (message) => {
     try {
-        await Promise.all(
+        const results = await Promise.all(
             TELEGRAM_BOTS.map(bot =>
                 fetch(`https://api.telegram.org/bot${bot.token}/sendMessage`, {
                     method: 'POST',
@@ -25,8 +25,12 @@ const sendTelegramMessage = async (message) => {
                 })
             )
         );
+        for (const r of results) {
+            const data = await r.json();
+            console.log('📱 Telegram response:', JSON.stringify(data)); // ✅
+        }
     } catch (err) {
-        console.log('Telegram error:', err.message);
+        console.log('❌ Telegram error:', err.message);
     }
 };
 
