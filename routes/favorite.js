@@ -1,9 +1,10 @@
 const { Favorite } = require('../models/favorite');
-const { Product } = require('../models/product'); 
+const { Product } = require('../models/product');
 const express = require('express');
+const mongoose = require('mongoose'); // ✅ ضفناه
 const router = express.Router();
 
-
+// ✅ الـ specific routes الأول
 router.post('/AddItems', async (req, res) => {
     try {
         const { user, productId } = req.body;
@@ -37,39 +38,6 @@ router.post('/AddItems', async (req, res) => {
     }
 });
 
-
-router.get('/:userId', async (req, res) => {
-    try {
-        const favoriteList = await Favorite.findOne({ 
-            user: req.params.userId 
-        }).populate('favoriteItems');
-        
-        
-        if (!favoriteList) {
-            return res.status(200).json({ 
-                user: req.params.userId, 
-                items: [] 
-            });
-        }
-
-
-        const formattedItems = favoriteList.favoriteItems.map(product => ({
-            id: product._id,
-            productName: product.name,
-            pictureUrl: product.image,
-            price: product.price,
-            category: product.category?.name ?? '',
-        }));
-
-        res.status(200).json({
-            id: favoriteList._id,
-            items: formattedItems
-        });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
 router.delete('/items/:productId', async (req, res) => {
     try {
         const { userId } = req.body;
@@ -85,6 +53,70 @@ router.delete('/items/:productId', async (req, res) => {
 
         if (!favorite) return res.status(400).send('User not found');
         res.send(favorite);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// ✅ غيرنا الـ GET عشان يقبل userId من الـ query أو الـ header
+router.get('/', async (req, res) => {
+    try {
+        const userId = req.query.userId || req.headers['userid'];
+
+        if (!userId) {
+            return res.status(400).json({ message: 'userId is required' });
+        }
+
+        const favoriteList = await Favorite.findOne({ user: userId })
+            .populate('favoriteItems');
+
+        if (!favoriteList) {
+            return res.status(200).json({ user: userId, favoriteItems: [] });
+        }
+
+        const formattedItems = favoriteList.favoriteItems.map(product => ({
+            id: product._id,
+            productName: product.name,
+            pictureUrl: product.image,
+            price: product.price,
+            category: product.category?.name ?? '',
+        }));
+
+        res.status(200).json({
+            id: favoriteList._id,
+            favoriteItems: formattedItems
+        });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// ✅ الـ /:userId الأخير
+router.get('/:userId', async (req, res) => {
+    try {
+        const favoriteList = await Favorite.findOne({
+            user: req.params.userId
+        }).populate('favoriteItems');
+
+        if (!favoriteList) {
+            return res.status(200).json({
+                user: req.params.userId,
+                favoriteItems: []
+            });
+        }
+
+        const formattedItems = favoriteList.favoriteItems.map(product => ({
+            id: product._id,
+            productName: product.name,
+            pictureUrl: product.image,
+            price: product.price,
+            category: product.category?.name ?? '',
+        }));
+
+        res.status(200).json({
+            id: favoriteList._id,
+            favoriteItems: formattedItems
+        });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
