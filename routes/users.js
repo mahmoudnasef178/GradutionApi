@@ -2,8 +2,23 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
+const multer = require('multer');
 
 const User = require('../models/User');
+
+// Multer - store file in memory as buffer (no disk needed)
+const storage = multer.memoryStorage();
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 2 * 1024 * 1024 }, // max 2MB
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only image files are allowed'), false);
+        }
+    }
+});
 
 /**
  * @swagger
@@ -217,5 +232,81 @@ router.get('/get/count', async (req, res) => {
     }
     res.status(200).send({ userCount: userCount });
 })
+
+/**
+ * @swagger
+ * /users/{id}/profile-image:
+ *   post:
+ *     summary: Upload profile image for a user
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Image uploaded successfully
+ *       400:
+ *         description: No image provided
+ *       404:
+ *         description: User not found
+ */
+router.post('/:id/profile-image', upload.single('image'), async (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ success: false, message: 'No image file provided' });
+    }
+
+    const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+
+    const user = await User.findByIdAndUpdate(
+        req.params.id,
+        { profileImage: base64Image },
+        { new: true }
+    ).select('-passwordHash');
+
+    if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    res.status(200).json({ success: true, profileImage: user.profileImage });
+});
+
+/**
+ * @swagger
+ * /users/{id}/profile-image:
+ *   get:
+ *     summary: Get profile image for a user
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Returns profileImage field
+ *       404:
+ *         description: User not found
+ */
+router.get('/:id/profile-image', async (req, res) => {
+    const user = await User.findById(req.params.id).select('profileImage');
+    if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    res.status(200).json({ success: true, profileImage: user.profileImage || '' });
+});
 
 module.exports = router;

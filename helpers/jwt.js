@@ -12,6 +12,7 @@ function authJwt() {
             {url: /\/public\/uploads(.*)/, methods: ['GET', 'OPTIONS'] },
             {url: /\/api\/product(.*)/ , methods: ['GET', 'OPTIONS'] },
             {url: /\/api\/v1\/categories(.*)/, methods: ['GET', 'OPTIONS']},
+            {url: /\/api\/v1\/users\/.*\/profile-image/, methods: ['GET', 'POST', 'OPTIONS']},
             `${api}/users/login`,
             `${api}/users/register`
         ]
@@ -19,10 +20,7 @@ function authJwt() {
 }
 
 async function isRevoked (req, payload, done){
-    if(!payload.isAdmin){
-        done(null, true)
-    } 
-
+    // Allow both admin and regular authenticated users
     done();
 }
 
