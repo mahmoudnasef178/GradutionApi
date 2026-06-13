@@ -5,6 +5,7 @@ const router = express.Router();
 const multer = require('multer');
 
 const User = require('../models/User');
+const ProfileImage = require('../models/ProfileImage');
 
 // Multer - store file in memory as buffer (no disk needed)
 const storage = multer.memoryStorage();
@@ -270,17 +271,13 @@ router.post('/:id/profile-image', upload.single('image'), async (req, res) => {
 
     const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
 
-    const user = await User.findByIdAndUpdate(
+    const profile = await ProfileImage.findByIdAndUpdate(
         req.params.id,
         { profileImage: base64Image },
-        { new: true }
-    ).select('-passwordHash');
+        { new: true, upsert: true }
+    );
 
-    if (!user) {
-        return res.status(404).json({ success: false, message: 'User not found' });
-    }
-
-    res.status(200).json({ success: true, profileImage: user.profileImage });
+    res.status(200).json({ success: true, profileImage: profile.profileImage });
 });
 
 /**
@@ -302,11 +299,8 @@ router.post('/:id/profile-image', upload.single('image'), async (req, res) => {
  *         description: User not found
  */
 router.get('/:id/profile-image', async (req, res) => {
-    const user = await User.findById(req.params.id).select('profileImage');
-    if (!user) {
-        return res.status(404).json({ success: false, message: 'User not found' });
-    }
-    res.status(200).json({ success: true, profileImage: user.profileImage || '' });
+    const profile = await ProfileImage.findById(req.params.id);
+    res.status(200).json({ success: true, profileImage: profile ? profile.profileImage : '' });
 });
 
 module.exports = router;
